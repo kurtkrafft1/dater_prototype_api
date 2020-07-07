@@ -1,0 +1,16 @@
+[
+    {
+        "model": "daterapp.dateruser",
+        "pk": 1,
+        "fields": {
+            "UID": "Akk51ubKomcdKLDIa1KCR8MHecx1"
+        }
+    },
+    {
+        "model": "daterapp.dateruser",
+        "pk": 2,
+        "fields": {
+            "UID": "nzsN0hC9sdak8ZFFntlIT1gyzdW2"
+        }
+    }
+]
