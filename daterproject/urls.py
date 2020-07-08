@@ -25,6 +25,10 @@ from django.conf.urls.static import static
 
 router = routers.DefaultRouter(trailing_slash=False)
 
+router.register(r'date_options', DateOptions, 'date_options')
+router.register(r'dater_users', DaterUsers, 'dater_users')
+router.register(r'past_dates', PastDates, 'past_dates')
+
 
 urlpatterns = [
     path('', include(router.urls)),

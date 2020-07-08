@@ -19,6 +19,7 @@ class PastDate(SafeDeleteModel):
     '''doesn't delete old dates, just archive them'''
 
     dater_user = models.ForeignKey(DaterUser, on_delete=models.DO_NOTHING)
+    UID = models.CharField(max_length=129, default = "nzsN0hC9sdak8ZFFntlIT1gyzdW2")
     first_maps_id = models.CharField(max_length=155)
     second_maps_id = models.CharField(max_length=155)
     third_maps_id = models.CharField(max_length=155)
