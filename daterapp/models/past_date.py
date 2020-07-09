@@ -24,6 +24,7 @@ class PastDate(SafeDeleteModel):
     second_maps_id = models.CharField(max_length=155)
     third_maps_id = models.CharField(max_length=155)
     created_at = models.DateTimeField()
+    # created_at = models.DateTimeField(auto_now_add=True)
     is_favorite = models.BooleanField()
 
     class Meta:

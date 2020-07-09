@@ -3,9 +3,11 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
-from daterapp.models import PastDate
+from daterapp.models import PastDate, DaterUser
 from .firebase  import auth, firebase, db 
 from .dater_users import DaterUserSerializer
+from django.utils import timezone
+from datetime import datetime
 
 
 class PastDateSerializer(serializers.HyperlinkedModelSerializer):
@@ -45,4 +47,52 @@ class PastDates(ViewSet):
         by_user_dates = dates.filter(UID = firebase_user['users'][0]['localId'])
         serializer = PastDateSerializer(by_user_dates, many=True, context={"request": request})
         return Response(serializer.data)
+    
+
+    def create(self, request):
+
+        firebase_user = auth.get_account_info(request.META['HTTP_TOKEN'])
+
+        newPastDate = PastDate()
+        dUser = DaterUser.objects.get(UID=firebase_user['users'][0]['localId'])
+        newPastDate.first_maps_id = request.data['first_maps_id']
+        newPastDate.second_maps_id = request.data['second_maps_id']
+        newPastDate.second_maps_id = request.data['second_maps_id']
+        newPastDate.third_maps_id = request.data['third_maps_id']
+        newPastDate.created_at = timezone.now()
+        newPastDate.is_favorite = request.data['is_favorite']
+        newPastDate.UID = firebase_user['users'][0]['localId']
+        newPastDate.dater_user = dUser
+
+        newPastDate.save()
+
+        serializer = PastDateSerializer(newPastDate, many=False, context = {'request': request})
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        date = PastDate.objects.get(pk=pk)
+        if date.is_favorite == True:
+            date.is_favorite = False
+        else:
+            date.is_favorite = True
+        date.save()
+
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+    
+    def destroy(self, request, pk=None):
+        '''handles delete product'''
+        try:
+            pd = PastDate.objects.get(pk=pk)    
+            pd.delete()
+
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        except pd.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 
