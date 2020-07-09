@@ -21,6 +21,8 @@ def register_user(request):
       birthdate = req_body["birthdate"]
       try:
         user = auth.create_user_with_email_and_password(email, password)
+        
+        auth.send_email_verification(user['idToken'])
 
         uid = user['localId']
 
