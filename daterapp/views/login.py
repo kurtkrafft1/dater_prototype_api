@@ -22,8 +22,16 @@ def login_user(request):
           user = auth.sign_in_with_email_and_password(email,password)
           # print("EHEREREHASF", user.idToken)
           # data = json.dumps({"valid": True, "token": user["idToken"]})
-          data = json.dumps({"valid": True, "token": user})
-          return HttpResponse(data, content_type='application/json')
+          info = auth.get_account_info(user['idToken'])
+          print("is_verified", info['users'][0]['emailVerified'])
+          if info['users'][0]['emailVerified']:
+            data = json.dumps({"valid": True, "token": user['idToken']})
+            return HttpResponse(data, content_type='application/json')
+          else:
+            data = json.dumps({"valid": False, "error": "Verify Email"})
+            return HttpResponse(data, content_type='application/json')
+
+          
       except:
-          data = json.dumps({"valid": False})
+          data = json.dumps({"valid": False, "error": "Invalid Credentials"})
           return HttpResponse(data, content_type='application/json')
