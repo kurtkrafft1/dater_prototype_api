@@ -4,6 +4,8 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from .firebase  import auth, firebase, db 
+from daterapp.models import DaterUser
+
 
 @csrf_exempt
 def register_user(request):
@@ -21,15 +23,19 @@ def register_user(request):
       birthdate = req_body["birthdate"]
       try:
         user = auth.create_user_with_email_and_password(email, password)
+        auth.send_email_verification(user['idToken'])
 
         uid = user['localId']
-
         data={"name":name, "birthdate": birthdate, "status": "1"}
-
         db.child('users').child(uid).child("details").set(data)
 
-        http_data = json.dumps({"valid": True, "token": user["idToken"]})
+        dUser = DaterUser.objects.create(
+          UID = uid
+        )
+        
+        dUser.save()
 
+        http_data = json.dumps({"valid": True, "token": user["idToken"]})
         return HttpResponse(http_data, content_type='application/json')
 
       except:
