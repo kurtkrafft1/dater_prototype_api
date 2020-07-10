@@ -42,10 +42,22 @@ class PastDates(ViewSet):
         '''
 
         firebase_user = auth.get_account_info(request.META['HTTP_TOKEN'])
-        
         dates = PastDate.objects.all()
-        by_user_dates = dates.filter(UID = firebase_user['users'][0]['localId'])
-        serializer = PastDateSerializer(by_user_dates, many=True, context={"request": request})
+        count = self.request.query_params.get('count', None)
+        if count is not None:
+           dates = PastDate.objects.raw('''
+                SELECT
+                *
+                from daterapp_pastdate 
+                where UID =%s;
+            ''', ["sl8ijawyD2QRxFlO03YzB91w5Fb2"])
+       
+
+        else: 
+           dates = dates.filter(UID = firebase_user['users'][0]['localId'])
+
+        print(dates)
+        serializer = PastDateSerializer(dates, many=True, context={"request": request})
         return Response(serializer.data)
     
 
