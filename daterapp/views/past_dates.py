@@ -40,18 +40,28 @@ class PastDates(ViewSet):
             was requested from firebase. 
 
         '''
-
-        firebase_user = auth.get_account_info(request.META['HTTP_TOKEN'])
-        
+        firebase_user = auth.get_account_info(request.META['HTTP_AUTHORIZATION'])
         dates = PastDate.objects.all()
-        by_user_dates = dates.filter(UID = firebase_user['users'][0]['localId'])
-        serializer = PastDateSerializer(by_user_dates, many=True, context={"request": request})
+        all = self.request.query_params.get('all', None)
+        if all is not None:
+           dates = PastDate.objects.raw('''
+                SELECT
+                *
+                from daterapp_pastdate 
+                where UID =%s;
+            ''', [firebase_user['users'][0]['localId']])
+       
+
+        else: 
+           dates = dates.filter(UID = firebase_user['users'][0]['localId'])
+
+        serializer = PastDateSerializer(dates, many=True, context={"request": request})
         return Response(serializer.data)
     
 
     def create(self, request):
 
-        firebase_user = auth.get_account_info(request.META['HTTP_TOKEN'])
+        firebase_user = auth.get_account_info(request.META['HTTP_AUTHORIZATION'])
 
         newPastDate = PastDate()
         dUser = DaterUser.objects.get(UID=firebase_user['users'][0]['localId'])
