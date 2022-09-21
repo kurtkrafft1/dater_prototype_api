@@ -22,7 +22,7 @@ pylint==2.5.3
 pylint-django==2.0.15
 pylint-plugin-utils==0.6
 Pyrebase==3.0.27
-python-jwt==2.0.1
+python-jwt==3.3.4
 pytz==2020.1
 requests==2.20.0
 requests-toolbelt==0.7.0
